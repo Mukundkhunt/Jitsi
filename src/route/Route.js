@@ -12,6 +12,7 @@ import VideoStreaming from '../screens/VideoStreaming';
 import Home from '../screens/Home';
 import ShareScreen from '../screens/ShareScreen';
 import Splash from '../screens/Splash';
+import VideoStreamingUser from '../screens/VideoStreamingUser';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +44,7 @@ export default class Route extends Component {
                     <Stack.Screen name={'ResetPassword'} component={ResetPassword} />
                     <Stack.Screen name={'Home'} component={Home} />
                     <Stack.Screen name={'VideoStreaming'} component={VideoStreaming} />
+                    <Stack.Screen name={'VideoStreamingUser'} component={VideoStreamingUser} />
                     <Stack.Screen name={'ShareScreen'} component={ShareScreen} />
                 </Stack.Navigator>
             </NavigationContainer>

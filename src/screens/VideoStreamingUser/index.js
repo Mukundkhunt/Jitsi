@@ -53,7 +53,7 @@ class VideoStreaming extends Component {
             joinSucceed: false,
             peerIds: [],
             isvideo: true,
-            qustionSetId: props.route.params?.qustionSetId,
+            qustionSetId: [],
             qustions: [],
             channelId: props.route.params?.channelId,
             isAudio: false,
@@ -137,55 +137,18 @@ class VideoStreaming extends Component {
                     }
                 })
             }
+
             if (state == VideoRemoteState.Starting) {
                 this.state.peerIds.map((item, index) => {
                     if (item.id === uid) {
-                        this.state.peerIds[index].video = false,
+                        this.state.peerIds[index].video = true,
                             this.setState({})
                     }
                 })
             }
         })
-
-        getQustionSetById(token1, this.state.qustionSetId).then((res) => {
-            if (res.status === 200) {
-                console.log('-----------res', res)
-                this.setState({ qustions: res?.data })
-            } else {
-                showAlertMessage({
-                    title: res.message,
-                    type: 'danger',
-                });
-            }
-        }).catch((error) => {
-            showErrorAlertMessage();
-        })
-
         this.startCall();
     };
-
-    // /**
-    //  * @name toggleRoll
-    //  * @description Function to toggle the roll between broadcaster and audience
-    //  */
-    // toggleRoll = async () => {
-    //     // Join Channel using null token and channel name
-    //     this.setState(
-    //         {
-    //             isHost: !this.state.isHost,
-    //         },
-    //         async () => {
-    //             await this._engine?.setClientRole(
-    //                 this.state.isHost ? ClientRole.Broadcaster : ClientRole.Audience
-    //             );
-    //         }
-    //     );
-    // };
-
-    /**
-     * @name startCall
-     * @description Function to start the call
-     */
     startCall = async () => {
         // Join Channel using null token and channel name
         await this._engine?.joinChannel(token, channelName, null, 0);
@@ -208,6 +171,7 @@ class VideoStreaming extends Component {
         this.setState({ isAudio: !this.state.isAudio })
     }
     muteVideo = async () => {
+        console.log(this.state.isvideo)
         await this._engine?.enableLocalVideo(!this.state.isvideo);
         this.setState({ isvideo: !this.state.isvideo })
     }
