@@ -76,8 +76,8 @@ class Home extends Component {
             }
             getToken(data, token, loginType).then((res) => {
                 if (res.status === 200) {
-                    this.socket.emit('join_channel', { channelId: res.data.channelId });
-                    if (loginType === '1') {
+                    // this.socket.emit('join_channel', { channelId: res.data.channelId });
+                    if (loginType == 1) {
                         console.log('+++++', loginType)
                         this.props.navigation.navigate('VideoStreaming', { token: res.data.token, channelName: email, qustionSetId: this.state.qustionSetId, channelId: res.data.channelId })
                     } else {

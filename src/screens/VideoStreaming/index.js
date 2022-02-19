@@ -84,6 +84,20 @@ class VideoStreaming extends Component {
     init = async () => {
         const { getQustionSetById, userData } = this.props
         let token1 = userData?.token
+
+        getQustionSetById(token1, this.state.qustionSetId).then((res) => {
+            console.log('-----------res', res)
+            if (res.status === 200) {
+                this.setState({ qustions: res?.data })
+            } else {
+                showAlertMessage({
+                    title: res.message,
+                    type: 'danger',
+                });
+            }
+        }).catch((error) => {
+            showErrorAlertMessage();
+        })
         this._engine = await RtcEngine.create(appId);
         await this._engine.enableVideo();
         await this._engine?.setChannelProfile(ChannelProfile.LiveBroadcasting);
@@ -164,20 +178,8 @@ class VideoStreaming extends Component {
                 })
             }
         })
+        console.log('[-----------------------------------]')
 
-        getQustionSetById(token1, this.state.qustionSetId).then((res) => {
-            if (res.status === 200) {
-                console.log('-----------res', res)
-                this.setState({ qustions: res?.data })
-            } else {
-                showAlertMessage({
-                    title: res.message,
-                    type: 'danger',
-                });
-            }
-        }).catch((error) => {
-            showErrorAlertMessage();
-        })
 
         this.startCall();
     };
