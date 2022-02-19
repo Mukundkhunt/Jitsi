@@ -23,6 +23,7 @@ import * as actions from '../../actions';
 import { connect } from 'react-redux';
 import io from "socket.io-client";
 import ShareScreen from '../ShareScreen';
+import ShareScreenUser from '../ShareScreenUser';
 
 /**
  * @property appId Agora App ID
@@ -73,6 +74,11 @@ class VideoStreaming extends Component {
 
     componentDidMount() {
         this.init();
+        this.socket.on('first_question', data => {
+            this.setState({ isShare: true })
+            this.state.qustions.push(data.question)
+            console.log('----------', message)
+        })
     }
 
     /**
@@ -129,6 +135,7 @@ class VideoStreaming extends Component {
         });
 
         this._engine.addListener('RemoteVideoStateChanged', (uid, state, reason, elapsed) => {
+            console.log('----------------------uid', uid, state)
             if (state == VideoRemoteState.Stopped) {
                 this.state.peerIds.map((item, index) => {
                     if (item.id === uid) {
@@ -139,6 +146,22 @@ class VideoStreaming extends Component {
             }
 
             if (state == VideoRemoteState.Starting) {
+                this.state.peerIds.map((item, index) => {
+                    if (item.id === uid) {
+                        this.state.peerIds[index].video = true,
+                            this.setState({})
+                    }
+                })
+            }
+            if (state == VideoRemoteState.Decoding) {
+                this.state.peerIds.map((item, index) => {
+                    if (item.id === uid) {
+                        this.state.peerIds[index].video = true,
+                            this.setState({})
+                    }
+                })
+            }
+            if (state == VideoRemoteState.Frozen) {
                 this.state.peerIds.map((item, index) => {
                     if (item.id === uid) {
                         this.state.peerIds[index].video = true,
@@ -181,7 +204,7 @@ class VideoStreaming extends Component {
             <View style={styles.max}>
                 {this.state.isShare ?
                     <>
-                        <ShareScreen questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => this.socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
+                        <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => this.socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
                         {this._renderRemoteVideos()}
                     </>
                     :
@@ -231,7 +254,7 @@ class VideoStreaming extends Component {
                                     style={styles.remote}
                                     uid={value.id}
                                     channelId={channelName}
-                                    renderMode={VideoRenderMode.Hidden}
+                                    renderMode={VideoRenderMode.Fit}
                                     zOrderMediaOverlay={true}
                                 />
                                 :

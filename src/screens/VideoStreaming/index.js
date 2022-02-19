@@ -73,6 +73,8 @@ class VideoStreaming extends Component {
 
     componentDidMount() {
         this.init();
+
+
     }
 
     /**
@@ -140,7 +142,23 @@ class VideoStreaming extends Component {
             if (state == VideoRemoteState.Starting) {
                 this.state.peerIds.map((item, index) => {
                     if (item.id === uid) {
-                        this.state.peerIds[index].video = false,
+                        this.state.peerIds[index].video = true,
+                            this.setState({})
+                    }
+                })
+            }
+            if (state == VideoRemoteState.Decoding) {
+                this.state.peerIds.map((item, index) => {
+                    if (item.id === uid) {
+                        this.state.peerIds[index].video = true,
+                            this.setState({})
+                    }
+                })
+            }
+            if (state == VideoRemoteState.Frozen) {
+                this.state.peerIds.map((item, index) => {
+                    if (item.id === uid) {
+                        this.state.peerIds[index].video = true,
                             this.setState({})
                     }
                 })
@@ -239,7 +257,7 @@ class VideoStreaming extends Component {
                         <RtcLocalView.SurfaceView
                             style={styles.max}
                             channelId={channelName}
-                            renderMode={VideoRenderMode.Hidden}
+                            renderMode={VideoRenderMode.Fit}
                         />
                         :
                         <View style={{ backgroundColor: 'red', flex: 1 }} ></View>
@@ -284,9 +302,7 @@ class VideoStreaming extends Component {
         console.log('-cha', this.state.channelId)
         this.socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
         this.setState({ isShare: true })
-        // this.socket.on('first_question', message => {
-        //     console.log('----------', message)
-        // })
+
     }
 
     _renderButton = () => {
