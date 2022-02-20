@@ -6,13 +6,22 @@ import Button from '../../../component/Button';
 import { heightPercentageToDP as hp, widthPercentageToDP } from 'react-native-responsive-screen';
 import Header from '../../../component/Header'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-
-export default class Profile extends Component {
+import { showAlertMessage, showErrorAlertMessage, validateEmail } from '../../../helper/Global'
+import * as actions from '../../../actions';
+import { connect } from 'react-redux';
+class Profile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             ImageData: [],
             gender: false,
+            userName: '',
+            email: '',
+            phoneNumber: '',
+            age: '',
+            language: '',
+            ethniCity: '',
+            geoLocation: ''
         }
     }
 
@@ -26,10 +35,29 @@ export default class Profile extends Component {
                 } else if (response.customButton) {
                     console.log('User tapped custom button: ', response.customButton);
                 } else {
-                    console.log('-----------resposen', response)
-                    let uri = response.assets[0].uri
-                    this.state.ImageData.push({ title: response.assets[0].fileName, url: uri, type: 'jpeg' })
-                    this.setState({})
+                    // const { uploadImage, userData } = this.props
+                    // let token = userData?.token;
+
+                    let data = [{
+                        url: response.assets[0].uri,
+                        name: 'photo.jpg',
+                        type: response.assets[0].type
+                    }]
+                    this.setState({ ImageData: data })
+                    // let formData = new FormData();
+                    // formData.append('image', data)
+
+                    // uploadImage(token, formData).then((res) => {
+                    //     if (res.status === 200) {
+                    //     } else {
+                    //         showAlertMessage({
+                    //             title: res.message,
+                    //             type: 'danger',
+                    //         });
+                    //     }
+                    // }).catch((error) => {
+                    //     showErrorAlertMessage();
+                    // })
                 }
 
             })
@@ -37,6 +65,50 @@ export default class Profile extends Component {
             console.log('--------error', error)
         }
     }
+
+    uploadProfile = async () => {
+        const { uploadImage, userData, uploadProfile } = this.props
+        const { userName, email, phoneNumber, gender, geoLocation, ethniCity, age, language } = this.state
+        let token = userData?.token;
+        let formData = new FormData();
+        formData.append('image', this.state.ImageData[0])
+        uploadImage(token, formData).then((res) => {
+            if (res.status === 200) {
+
+            } else {
+                showAlertMessage({
+                    title: res.message,
+                    type: 'danger',
+                });
+            }
+        }).catch((error) => {
+            showErrorAlertMessage();
+        })
+
+        let data = {
+            name: userName,
+            gender: gender ? 1 : 0,
+        }
+        if (phoneNumber) data.phoneNumber = phoneNumber
+        if (age) data.age = age
+        if (language) data.address = language
+        if (geoLocation) data.address = geoLocation
+
+        uploadProfile(token, data).then((res) => {
+            if (res.status === 200) {
+                this.props.navigation.navigate('Home')
+            } else {
+                showAlertMessage({
+                    title: res.message,
+                    type: 'danger',
+                });
+            }
+        }).catch((error) => {
+            showErrorAlertMessage();
+        })
+
+    }
+
     render() {
         return (
             <View style={styles.mainView} >
@@ -55,12 +127,14 @@ export default class Profile extends Component {
                             title={'Username*'}
                             placeholder={'Enter Your Username'}
                             iconName={'person-outline'}
+                            onChangeText={(text) => this.setState({ userName: text })}
                         />
                         <View style={{ marginTop: hp(2) }} >
                             <P_TextInput
                                 title={'Email*'}
                                 placeholder={'Enter Your Email'}
                                 iconName={'mail-outline'}
+                                onChangeText={(text) => this.setState({ email: text })}
                             />
                         </View>
                         <View style={{ marginTop: 20 }} >
@@ -68,7 +142,7 @@ export default class Profile extends Component {
                                 title={'Mobile Number'}
                                 placeholder={'Enter Your Mobile Number'}
                                 iconName={'call-outline'}
-
+                                onChangeText={(text) => this.setState({ phoneNumber: text })}
                             />
                         </View>
 
@@ -77,7 +151,7 @@ export default class Profile extends Component {
                                 title={'Age'}
                                 placeholder={'Enter Your age'}
                                 iconName={'lock-closed-outline'}
-
+                                onChangeText={(text) => this.setState({ age: text })}
                             />
                         </View>
                         <View style={{ marginTop: 20 }} >
@@ -85,7 +159,7 @@ export default class Profile extends Component {
                                 title={'Language'}
                                 placeholder={'Enter Your Language'}
                                 iconName={'language-outline'}
-
+                                onChangeText={(text) => this.setState({ language: text })}
                             />
                         </View>
                         <View style={{ marginTop: 20, alignSelf: 'flex-start', marginLeft: widthPercentageToDP(7) }} >
@@ -108,7 +182,7 @@ export default class Profile extends Component {
                                 title={'Ethnicity'}
                                 placeholder={'Enter Your Ethnicity'}
                                 iconName={'checkbox-outline'}
-
+                                onChangeText={(text) => this.setState({ ethniCity: text })}
                             />
                         </View>
                         <View style={{ marginTop: 20 }} >
@@ -116,11 +190,12 @@ export default class Profile extends Component {
                                 title={'Geolocation'}
                                 placeholder={'Enter Your location'}
                                 iconName={'location-outline'}
-
+                                onChangeText={(text) => this.setState({ geoLocation: text })}
                             />
                         </View>
                         <Button
                             buttonTitle={'Save'}
+                            onPress={() => this.uploadProfile()}
                         />
                     </View>
                     {/* <TouchableOpacity>
@@ -131,3 +206,6 @@ export default class Profile extends Component {
         );
     }
 }
+const mapStateToProps = ({ auth: { userData } }) => ({ userData });
+
+export default connect(mapStateToProps, actions)(Profile);

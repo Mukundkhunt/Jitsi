@@ -143,5 +143,53 @@ export const setProfile = (token, body) => async (dispatch) => {
         });
 };
 
+export const uploadImage = (token, body) => async (dispatch) => {
+    let header = {
+        Accept: 'application/json',
+        authorization: token,
+        // 'Content-Type': 'multipart/form-data',
+    }
+    return makeAPIRequest({
+        method: 'post',
+        url: api.uploadImage,
+        data: body,
+        headers: header
+    })
+        .then(async (response) => {
+            console.log('signInUser API response :: ', response.data);
+            if (response.data.status === 200) {
+                return Promise.resolve(response.data);
+            }
+            return Promise.reject();
+        })
+        .catch((err) => {
+            return Promise.resolve(err.response.data);
+        });
+};
+
+
+export const uploadProfile = (token, body) => async (dispatch) => {
+    let header = {
+        Accept: 'application/json',
+        authorization: token,
+        // 'Content-Type': 'multipart/form-data',
+    }
+    return makeAPIRequest({
+        method: 'put',
+        url: api.profile,
+        data: body,
+        headers: header
+    })
+        .then(async (response) => {
+            console.log('signInUser API response :: ', response.data);
+            if (response.data.status === 200) {
+                return Promise.resolve(response.data);
+            }
+            return Promise.reject();
+        })
+        .catch((err) => {
+            return Promise.resolve(err.response.data);
+        });
+};
 
 

@@ -24,7 +24,8 @@ const api = {
     admin: '/channel',
     question_set: '/question_set',
     answer: '/answer',
-    profile: '/'
+    profile: '/',
+    uploadImage: '/upload/compress_image/profile'
 };
 
 export { baseURL, api, GET, POST, PUT, DELETE, GOOGLE_API_KEY, socket, bucketURL };

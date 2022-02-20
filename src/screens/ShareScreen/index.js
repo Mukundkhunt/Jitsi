@@ -30,10 +30,7 @@ export default class ShareScreen extends Component {
         this.state = {
             questionIndex: 0
         }
-        this.socket = io('https://jitsi.api.pip-idea.tk', {
-            transports: ['websocket'],
-        }
-        )
+
     }
     render() {
         const { questions, onScrollEndDrag, userData, channelId } = this.props
@@ -53,7 +50,7 @@ export default class ShareScreen extends Component {
                             questions[0]?.question.length
                         );
                         // if (pagenumber - 1 < this.state.questionIndex) {
-                        socket.emit('admin_share', { question: questions[0].question[pagenumber - 1], channelId: channelId })
+                        socket.emit('admin_share', { question: [questions[0].question[pagenumber - 1]], channelId: channelId })
                         // } else {
                         //     this.socket.emit('next_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
                         //     // this.socket.emit('next_question', { question: this.state.qustions[0].question[pagenumber - 1], channelId: channelId })

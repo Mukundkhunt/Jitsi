@@ -75,11 +75,11 @@ class VideoStreaming extends Component {
             isHost: true,
             joinSucceed: false,
             peerIds: [],
-            isvideo: false,
+            isvideo: true,
             qustionSetId: props.route.params?.qustionSetId,
             qustions: [],
             channelId: props.route.params?.channelId,
-            isAudio: false,
+            isAudio: true,
             isShare: false
         };
         if (Platform.OS === 'android') {
@@ -344,10 +344,14 @@ class VideoStreaming extends Component {
     };
 
     adminShare = async () => {
-        console.log('-cha', this.state.channelId)
-        socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
-        this.setState({ isShare: true })
-
+        if (this.state.isShare) {
+            socket.emit('stop_share', { channelId: this.state.channelId });
+            this.setState({ isShare: false })
+        } else {
+            await this._engine?.enableLocalVideo(false);
+            socket.emit('admin_share', { question: [this.state.qustions[0].question[0]], channelId: this.state.channelId });
+            this.setState({ isShare: true, isvideo: false })
+        }
     }
 
     _renderButton = () => {
@@ -357,7 +361,7 @@ class VideoStreaming extends Component {
                     <Icon name='share-outline' size={20} color={'white'} style={{ alignSelf: 'center' }} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.middleButton} onPress={() => this.muteMic()} >
-                    <Icon name={this.state.isAudio ? 'mic-off-outline' : 'mic-outline'} size={20} color={'white'} style={{ alignSelf: 'center' }} />
+                    <Icon name={this.state.isAudio ? 'mic-outline' : 'mic-off-outline'} size={20} color={'white'} style={{ alignSelf: 'center' }} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.centerButton} onPress={() => this.endCall()} >
                     <Icon name='call-outline' size={25} color={'white'} style={{ alignSelf: 'center' }} />
