@@ -62,7 +62,31 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: hp(2),
         borderRadius: 5
+    },
+    mcqBotton: { flexDirection: 'row', alignSelf: 'center', position: 'absolute', bottom: 95 },
+    mcqBotton1: { height: 48, width: 70, backgroundColor: Colors.boxColor, margin: 5, alignItems: 'center', justifyContent: 'center' },
+    mcqText: {
+        fontFamily: Fonts.regular,
+        fontSize: 12,
+        color: Colors.textColor2,
+        alignSelf: 'center'
+    },
+    foucsButton: {
+        height: hp(6),
+        width: wp(86.67),
+        backgroundColor: Colors.boxColor,
+        position: 'absolute',
+        bottom: 95,
+        alignSelf: 'center',
+        justifyContent: 'center'
+    },
+    foucsText: {
+        fontFamily: Fonts.regular,
+        fontSize: 12,
+        color: Colors.textColor2,
+        alignSelf: 'center'
     }
+
 
 })
 

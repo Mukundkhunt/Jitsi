@@ -31,17 +31,23 @@ export default StyleSheet.create({
         height: dimensions.height,
     },
     remoteContainer: {
-        width: '100%',
-        height: heightPercentageToDP(15),
+        // width: '100%',
+        // height: heightPercentageToDP(15),
         position: 'absolute',
-        bottom: 5,
+        bottom: heightPercentageToDP(2),
     },
     remoteContainerContent: {
         paddingHorizontal: 2.5,
     },
     remote: {
-        width: 150,
-        height: 150,
+        width: 60,
+        height: 75,
+        marginHorizontal: 2.5,
+        backgroundColor: 'red'
+    },
+    remote1: {
+        width: 60,
+        height: 75,
         marginHorizontal: 2.5,
     },
     noUserText: {
@@ -57,9 +63,12 @@ export default StyleSheet.create({
     bottomButton: {
         flexDirection: 'row',
         position: 'absolute',
-        bottom: 20,
-        width: '100%',
-        justifyContent: 'space-between'
+        bottom: 40,
+        alignSelf: 'center',
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     lastButton: {
         height: 32,
@@ -75,7 +84,7 @@ export default StyleSheet.create({
         width: 32,
         backgroundColor: 'black',
         borderRadius: 8,
-        marginRight: 39,
+        marginRight: 9,
         alignSelf: 'center',
         justifyContent: 'center'
     },
@@ -85,7 +94,8 @@ export default StyleSheet.create({
         backgroundColor: 'black',
         borderRadius: 8,
         alignSelf: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginLeft: 9
     },
     centerButton: {
         height: 42,
@@ -93,5 +103,11 @@ export default StyleSheet.create({
         backgroundColor: 'red',
         borderRadius: 21,
         justifyContent: 'center'
-    }
+    },
+    imageStyle: {
+        height: heightPercentageToDP(73.03),
+        width: '100%',
+        borderBottomLeftRadius: 40,
+        borderBottomRightRadius: 40
+    },
 });
