@@ -63,9 +63,12 @@ export default StyleSheet.create({
     bottomButton: {
         flexDirection: 'row',
         position: 'absolute',
-        bottom: 20,
-        width: '100%',
-        justifyContent: 'space-between'
+        bottom: 40,
+        alignSelf: 'center',
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     lastButton: {
         height: 32,
@@ -81,7 +84,7 @@ export default StyleSheet.create({
         width: 32,
         backgroundColor: 'black',
         borderRadius: 8,
-        marginRight: 39,
+        marginRight: 9,
         alignSelf: 'center',
         justifyContent: 'center'
     },
@@ -91,7 +94,8 @@ export default StyleSheet.create({
         backgroundColor: 'black',
         borderRadius: 8,
         alignSelf: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginLeft: 9
     },
     centerButton: {
         height: 42,
@@ -105,5 +109,5 @@ export default StyleSheet.create({
         width: '100%',
         borderBottomLeftRadius: 40,
         borderBottomRightRadius: 40
-    }
+    },
 });

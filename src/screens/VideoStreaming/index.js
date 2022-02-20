@@ -91,6 +91,12 @@ class VideoStreaming extends Component {
     }
 
     componentDidMount() {
+        socket.on('buzzer_pressed', async (data) => {
+            showAlertMessage({
+                title: data.message,
+                type: 'success',
+            });
+        })
         this.init();
     }
 

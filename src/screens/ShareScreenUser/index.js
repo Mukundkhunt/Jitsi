@@ -1,9 +1,11 @@
-import { Dimensions, FlatList, Image, Text, View } from 'react-native'
+import { Dimensions, FlatList, Image, Text, TouchableOpacity, View } from 'react-native'
 import React, { Component } from 'react'
 import styles from './style'
 import Header from '../../component/Header'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import io from "socket.io-client";
+import { bucketURL, socket } from '../../helper/ApiConstant'
+import { showAlertMessage, showErrorAlertMessage } from '../../helper/Global'
 
 const { width } = Dimensions.get('window')
 const { height } = Dimensions.get('window')
@@ -27,13 +29,46 @@ export default class ShareScreenUser extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            questionIndex: 0
+            questionIndex: 0,
+            isCorrect: false,
+            answerIndex: 0
         }
 
     }
+    answerQustion = (item, qus, i) => {
+        const { userData, addAnswer, channelId, questions } = this.props
+        let token = userData?.token
+        let data = {
+            answer: item,
+            questionId: qus._id,
+            channelId: channelId
+        }
+
+        addAnswer(token, data).then((res) => {
+            if (res.status === 200) {
+                console.log(res.data)
+                if (res.data) {
+                    questions[0].isCorrect = true
+                    this.setState({})
+                    this.setState({ answerIndex: i })
+                }
+            } else {
+                showAlertMessage({
+                    title: res.message,
+                    type: 'danger',
+                });
+            }
+        }).catch((error) => {
+            showErrorAlertMessage();
+        })
+
+    }
+    buzzerButton = () => {
+        const { userData, channelId } = this.props
+        socket.emit('buzzer_on', { channelId: channelId, user: userData })
+    }
     render() {
         const { questions, onScrollEndDrag, userData, channelId } = this.props
-        console.log(questions)
         return (
             <View style={styles.mainView} >
                 <Header
@@ -44,28 +79,10 @@ export default class ShareScreenUser extends Component {
                     horizontal
                     data={questions}
                     pagingEnabled
-                    // onMomentumScrollEnd={(e) => {
-                    //     let pagenumber = Math.min(
-                    //         Math.max(Math.floor(e.nativeEvent.contentOffset.x / width + 0.5) + 1, 0),
-                    //         questions[0]?.question.length
-                    //     );
-                    //     console.log(channelId)
-                    //     if (pagenumber - 1 < this.state.questionIndex) {
-                    //         this.socket.emit('previous_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
-                    //     } else {
-                    //         this.socket.emit('next_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
-                    //         // this.socket.emit('next_question', { question: this.state.qustions[0].question[pagenumber - 1], channelId: channelId })
-                    //     }
-                    //     this.setState({ questionIndex: pagenumber - 1 })
-                    // }}
-                    // disableIntervalMomentum
-                    // getItemLayout={(data, index) => ({ length: width, offset: width * index, index })}
                     keyExtractor={(item, index) => index.toString()}
-                    // snapToOffsets={questions[0]?.question.map((st, index) => index * width)}
                     renderItem={({ item, index }) => {
                         return (
                             <View style={{ width: widthPercentageToDP(100) }} >
-                                {console.log(item)}
                                 <View style={styles.boxStyles} >
                                     <Text style={styles.textStyle} >{`Quse ${index + 1} of ${'10'}`}</Text>
                                     <Text style={styles.qustionStyle} >{item?.name}</Text>
@@ -75,6 +92,7 @@ export default class ShareScreenUser extends Component {
                                             :
                                             <></>
                                     }
+
                                     {
                                         item?.options.map((item, index) => {
                                             return (
@@ -86,22 +104,42 @@ export default class ShareScreenUser extends Component {
                                         })
                                     }
                                 </View>
+                                <View style={styles.mcqBotton} >
+                                    {item?.options.map((item1, i) => {
+                                        return (
+                                            <>
+                                                {item?.isCorrect ?
+                                                    <>
+                                                        {
+                                                            item?.correctAnswer == item1 ?
+                                                                <TouchableOpacity style={[styles.mcqBotton1, { borderColor: 'green', borderWidth: 1 }]} onPress={() => this.answerQustion(item1, item)} ><Text style={styles.mcqText} >{item1}</Text></TouchableOpacity>
+                                                                :
+                                                                <>
+                                                                    {i == this.state.answerIndex ?
+                                                                        <TouchableOpacity style={[styles.mcqBotton1, { borderColor: 'red', borderWidth: 1 }]} onPress={() => this.answerQustion(item1, item)} ><Text style={styles.mcqText} >{item1}</Text></TouchableOpacity>
+                                                                        :
+                                                                        <TouchableOpacity style={styles.mcqBotton1} onPress={() => this.answerQustion(item1, item)} ><Text style={styles.mcqText} >{item1}</Text></TouchableOpacity>
+                                                                    }
+                                                                </>
+                                                        }
+                                                    </>
+                                                    :
+                                                    <TouchableOpacity style={styles.mcqBotton1} onPress={() => this.answerQustion(item1, item, i)} ><Text style={styles.mcqText} >{item1}</Text></TouchableOpacity>
+                                                }
+                                            </>
+                                            // }
+                                        )
+                                    })}
+                                </View>
+                                {
+                                    item?.questionType == 2 ?
+                                        <TouchableOpacity style={styles.foucsButton} onPress={() => this.buzzerButton()} >
+                                            <Text style={styles.foucsText} >Press</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        <></>
+                                }
                             </View>
-                            // <View style={{ width: widthPercentageToDP(100) }} >
-                            //     <View style={styles.boxStyles} >
-                            //         <Text style={styles.textStyle} >{`Quse ${index + 1} of ${'10'}`}</Text>
-                            //         <Text style={styles.qustionStyle} >{item?.name}</Text>
-                            //         {
-                            //             item.options.map((item, index) => {
-                            //                 return (
-                            //                     <View style={styles.optionStyles} >
-                            //                         <Text style={styles.optionText} >{item}</Text>
-                            //                     </View>
-                            //                 )
-                            //             })
-                            //         }
-                            //     </View>
-                            // </View>
                         )
                     }}
                 />

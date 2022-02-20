@@ -76,11 +76,11 @@ class VideoStreaming extends Component {
             isHost: true,
             joinSucceed: false,
             peerIds: [],
-            isvideo: false,
+            isvideo: true,
             qustionSetId: [],
             qustions: [],
             channelId: props.route.params?.channelId,
-            isAudio: false,
+            isAudio: true,
             isShare: false
         };
 
@@ -92,15 +92,28 @@ class VideoStreaming extends Component {
         }
     }
 
-    componentDidMount() {
-        socket.on('get_question', data => {
+    componentDidMount = async () => {
+        socket.on('get_question', async (data) => {
             // this.state.qustions.push({ question: data.question })
-            this.setState({ qustions: data.question, isShare: true })
-            console.log('----------', data)
+            await this._engine?.enableLocalAudio(false);
+            await this._engine?.enableLocalVideo(false);
+            this.setState({ qustions: data.question, isShare: true, isvideo: false, isAudio: false })
+        })
+
+        socket.on('stop_question', async (data) => {
+            // this.state.qustions.push({ question: data.question })
+            this.setState({ isShare: false })
+        })
+
+        socket.on('buzzer_pressed', async (data) => {
+            showAlertMessage({
+                title: data.message,
+                type: 'success',
+            });
         })
 
 
-        // this.init();
+        this.init();
     }
 
     /**
@@ -212,7 +225,7 @@ class VideoStreaming extends Component {
     };
 
     muteMic = async () => {
-        await this._engine?.enableLocalAudio(this.state.isAudio);
+        await this._engine?.enableLocalAudio(!this.state.isAudio);
         this.setState({ isAudio: !this.state.isAudio })
     }
     muteVideo = async () => {
@@ -225,29 +238,40 @@ class VideoStreaming extends Component {
         const { userData } = this.props
         return (
             <View style={styles.max}>
-                {!this.state.isvideo ?
-                    <>
-                        <Header
-                            isBack={true}
-                            title={'Meeting Name'}
-                            isRight={true}
-                            isVideo={true}
-                            audioName={this.state.isAudio ? 'mic-outline' : 'mic-off-outline'}
-                            videoName={this.state.isvideo ? 'video' : 'video-off'}
-                            micPress={() => this.muteMic()}
-                            videoPress={() => this.muteVideo()}
-                        />
-                        <Image
-                            source={{ uri: bucketURL + userData?.image }}
-                            style={styles.imageStyle}
-                        />
-                    </>
-                    :
-                    <>
-                        {this._renderVideos()}
-                    </>
-                }
-                {this._renderRemoteVideos()}
+                <>
+                    {this.state.isShare ?
+                        <>
+                            <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} addAnswer={this.props.addAnswer} />
+                            {this._renderRemoteVideos()}
+                        </>
+                        :
+                        <>
+                            {!this.state.isvideo ?
+                                <>
+                                    <Header
+                                        isBack={true}
+                                        title={'Meeting Name'}
+                                        isRight={true}
+                                        isVideo={true}
+                                        audioName={this.state.isAudio ? 'mic-outline' : 'mic-off-outline'}
+                                        videoName={this.state.isvideo ? 'video' : 'video-off'}
+                                        micPress={() => this.muteMic()}
+                                        videoPress={() => this.muteVideo()}
+                                    />
+                                    <Image
+                                        source={{ uri: bucketURL + userData?.image }}
+                                        style={styles.imageStyle}
+                                    />
+                                    {this._renderRemoteVideos()}
+                                </>
+                                :
+                                <>
+                                    {this._renderVideos()}
+                                </>
+                            }
+                        </>
+                    }
+                </>
             </View>
         );
     }
@@ -268,7 +292,7 @@ class VideoStreaming extends Component {
                 ) : (
                     <></>
                 )}
-                {/* {this._renderRemoteVideos()} */}
+                {this._renderButton()}
             </View>
         ) : null;
     };
@@ -302,7 +326,18 @@ class VideoStreaming extends Component {
         );
     };
 
-
+    _renderButton = () => {
+        return (
+            <View style={styles.bottomButton} >
+                <TouchableOpacity style={styles.lastButton1} onPress={() => this.muteMic()} >
+                    <Icon name={this.state.isAudio ? 'mic-outline' : 'mic-off-outline'} size={20} color={'white'} style={{ alignSelf: 'center' }} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.middleButton} onPress={() => this.muteVideo()} >
+                    <IconF name={this.state.isvideo ? 'video' : 'video-off'} size={17} color={'white'} style={{ alignSelf: 'center' }} />
+                </TouchableOpacity>
+            </View>
+        )
+    }
 
 }
 
