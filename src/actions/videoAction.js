@@ -15,7 +15,7 @@ export const getToken = (body, token, loginType) => async (dispatch) => {
     }
     return makeAPIRequest({
         method: 'post',
-        url: loginType == '1' ? api.admin : api.generate_token,
+        url: loginType == 1 ? api.admin : api.generate_token,
         data: body,
         headers: header
     })
@@ -67,6 +67,55 @@ export const getQustionSetById = (token, id) => async (dispatch) => {
         method: 'get',
         url: `${api.question_set}/${id}`,
         headers: header
+    })
+        .then(async (response) => {
+            console.log('signInUser API response :: ', response.data);
+            if (response.data.status === 200) {
+
+                return Promise.resolve(response.data);
+            }
+            return Promise.reject();
+        })
+        .catch((err) => {
+            console.log('signInUser API error :: ', err);
+            return Promise.resolve(err.response.data);
+        });
+};
+
+export const deleteChannel = (token, id) => async (dispatch) => {
+    let header = {
+        Accept: 'application/json',
+        authorization: token
+    }
+    return makeAPIRequest({
+        method: 'get',
+        url: `${api.admin}/${id}`,
+        headers: header
+    })
+        .then(async (response) => {
+            console.log('signInUser API response :: ', response.data);
+            if (response.data.status === 200) {
+
+                return Promise.resolve(response.data);
+            }
+            return Promise.reject();
+        })
+        .catch((err) => {
+            console.log('signInUser API error :: ', err);
+            return Promise.resolve(err.response.data);
+        });
+};
+
+export const addAnswer = (token, body) => async (dispatch) => {
+    let header = {
+        Accept: 'application/json',
+        authorization: token
+    }
+    return makeAPIRequest({
+        method: 'post',
+        url: api.answer,
+        headers: header,
+        data: body
     })
         .then(async (response) => {
             console.log('signInUser API response :: ', response.data);

@@ -21,9 +21,9 @@ import styles from './style';
 import { showAlertMessage, showErrorAlertMessage, validateEmail } from '../../helper/Global'
 import * as actions from '../../actions';
 import { connect } from 'react-redux';
-import io from "socket.io-client";
 import ShareScreen from '../ShareScreen';
 import ShareScreenUser from '../ShareScreenUser';
+import { socket } from '../../helper/ApiConstant';
 
 /**
  * @property appId Agora App ID
@@ -60,10 +60,7 @@ class VideoStreaming extends Component {
             isAudio: false,
             isShare: false
         };
-        this.socket = io('https://jitsi.api.pip-idea.tk', {
-            transports: ['websocket'],
-        }
-        )
+
         if (Platform.OS === 'android') {
             // Request required permissions from Android
             requestCameraAndAudioPermission().then(() => {
@@ -73,12 +70,14 @@ class VideoStreaming extends Component {
     }
 
     componentDidMount() {
-        this.init();
-        this.socket.on('first_question', data => {
-            this.setState({ isShare: true })
-            this.state.qustions.push(data.question)
-            console.log('----------', message)
+        socket.on('get_question', data => {
+            // this.state.qustions.push({ question: data.question })
+            this.setState({ qustions: data.question, isShare: true })
+            console.log('----------', data)
         })
+
+
+        this.init();
     }
 
     /**
@@ -204,15 +203,16 @@ class VideoStreaming extends Component {
             <View style={styles.max}>
                 {this.state.isShare ?
                     <>
-                        <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => this.socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
-                        {this._renderRemoteVideos()}
+                        <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
+                        {/* {this._renderRemoteVideos()} */}
                     </>
                     :
                     <View style={styles.max}>
                         {this._renderVideos()}
                     </View>
                 }
-                {this._renderButton()}
+                {this._renderRemoteVideos()}
+                {/* {this._renderButton()} */}
             </View>
         );
     }
@@ -233,7 +233,7 @@ class VideoStreaming extends Component {
                 ) : (
                     <></>
                 )}
-                {this._renderRemoteVideos()}
+                {/* {this._renderRemoteVideos()} */}
             </View>
         ) : null;
     };
@@ -269,7 +269,7 @@ class VideoStreaming extends Component {
 
     adminShare = async () => {
         console.log('-cha', this.state.channelId)
-        this.socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
+        socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
         this.setState({ isShare: true })
         // this.socket.on('first_question', message => {
         //     console.log('----------', message)

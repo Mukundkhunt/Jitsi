@@ -1,9 +1,10 @@
-import { Dimensions, FlatList, Text, View } from 'react-native'
+import { Dimensions, FlatList, Image, Text, View } from 'react-native'
 import React, { Component } from 'react'
 import styles from './style'
 import Header from '../../component/Header'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import io from "socket.io-client";
+import { bucketURL, socket } from '../../helper/ApiConstant'
 
 const { width } = Dimensions.get('window')
 const { height } = Dimensions.get('window')
@@ -51,14 +52,13 @@ export default class ShareScreen extends Component {
                             Math.max(Math.floor(e.nativeEvent.contentOffset.x / width + 0.5) + 1, 0),
                             questions[0]?.question.length
                         );
-                        console.log(channelId)
-                        if (pagenumber - 1 < this.state.questionIndex) {
-                            this.socket.emit('previous_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
-                        } else {
-                            this.socket.emit('next_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
-                            // this.socket.emit('next_question', { question: this.state.qustions[0].question[pagenumber - 1], channelId: channelId })
-                        }
-                        this.setState({ questionIndex: pagenumber - 1 })
+                        // if (pagenumber - 1 < this.state.questionIndex) {
+                        socket.emit('admin_share', { question: questions[0].question[pagenumber - 1], channelId: channelId })
+                        // } else {
+                        //     this.socket.emit('next_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
+                        //     // this.socket.emit('next_question', { question: this.state.qustions[0].question[pagenumber - 1], channelId: channelId })
+                        // }
+                        // this.setState({ questionIndex: pagenumber - 1 })
                     }}
                     disableIntervalMomentum
                     getItemLayout={(data, index) => ({ length: width, offset: width * index, index })}
@@ -67,13 +67,21 @@ export default class ShareScreen extends Component {
                     renderItem={({ item, index }) => {
                         return (
                             <View style={{ width: widthPercentageToDP(100) }} >
+                                {console.log(item)}
                                 <View style={styles.boxStyles} >
                                     <Text style={styles.textStyle} >{`Quse ${index + 1} of ${questions[0]?.question.length}`}</Text>
                                     <Text style={styles.qustionStyle} >{item?.name}</Text>
                                     {
-                                        item.options.map((item, index) => {
+                                        item?.questionType == 0 ?
+                                            <Image source={{ uri: bucketURL + item?.image }} style={styles.imageStyle} />
+                                            :
+                                            <></>
+                                    }
+                                    {
+                                        item?.options.map((item, index) => {
                                             return (
-                                                <View style={styles.optionStyles} >
+                                                <View style={[styles.optionStyles, { marginTop: index == 0 ? heightPercentageToDP(2.5) : heightPercentageToDP(1.5) }]} >
+                                                    <View style={styles.radioCircle} ></View>
                                                     <Text style={styles.optionText} >{item}</Text>
                                                 </View>
                                             )

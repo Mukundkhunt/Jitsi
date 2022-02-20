@@ -15,28 +15,53 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 1,
         paddingHorizontal: 10,
-        alignSelf: 'center'
+        paddingVertical: hp(3),
+        alignSelf: 'center',
+        borderColor: Colors.boxColor
     },
     textStyle: {
-        fontFamily: Fonts.bold,
-        fontSize: 12
+        fontFamily: Fonts.regular,
+        fontSize: 12,
+        color: Colors.textColor1,
     },
     qustionStyle: {
-        fontFamily: Fonts.bold,
-        fontSize: 14
+        fontFamily: Fonts.medium,
+        fontSize: 16,
+        color: Colors.blackColor,
+        marginTop: hp(1)
     },
     optionStyles: {
         width: wp(84),
         height: hp(5),
-        borderWidth: 1,
-        marginTop: hp(2),
+        backgroundColor: Colors.boxColor,
         borderRadius: 5,
-        justifyContent: 'center',
-        paddingHorizontal: 9
+        paddingHorizontal: 9,
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     optionText: {
-        fontFamily: Fonts.bold,
-        fontSize: 14
+        fontFamily: Fonts.medium,
+        fontSize: 14,
+        color: Colors.blackColor,
+        alignSelf: 'center'
+    },
+    radioCircle: {
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        justifyContent: 'center',
+        borderColor: Colors.boxColor,
+        alignSelf: 'center',
+        backgroundColor: Colors.AppColor,
+        marginRight: hp(1)
+    },
+    imageStyle: {
+        width: wp(77.1),
+        height: hp(18.72),
+        alignSelf: 'center',
+        marginTop: hp(2),
+        borderRadius: 5
     }
 
 })

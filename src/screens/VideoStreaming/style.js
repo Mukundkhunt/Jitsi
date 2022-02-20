@@ -1,5 +1,6 @@
 import { Dimensions, StyleSheet } from 'react-native';
-import { heightPercentageToDP } from 'react-native-responsive-screen';
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
+import { Colors } from '../../helper/colors/Colors';
 
 const dimensions = {
     width: Dimensions.get('window').width,
@@ -32,17 +33,22 @@ export default StyleSheet.create({
     },
     remoteContainer: {
         width: '100%',
-        height: heightPercentageToDP(15),
-        position: 'absolute',
-        bottom: 5,
     },
     remoteContainerContent: {
         paddingHorizontal: 2.5,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     remote: {
-        width: 150,
-        height: 150,
-        marginHorizontal: 2.5,
+        width: widthPercentageToDP(41.6),
+        height: heightPercentageToDP(23.02),
+        backgroundColor: 'red',
+        margin: 5
+    },
+    remote1: {
+        width: widthPercentageToDP(41.6),
+        height: heightPercentageToDP(23.02),
+        margin: 5
     },
     noUserText: {
         paddingHorizontal: 10,
@@ -93,5 +99,9 @@ export default StyleSheet.create({
         backgroundColor: 'red',
         borderRadius: 21,
         justifyContent: 'center'
+    },
+    adminBackground: {
+        backgroundColor: Colors.AppColor,
+        flex: 1
     }
 });

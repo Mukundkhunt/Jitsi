@@ -9,7 +9,7 @@ import * as actions from '../../actions';
 import { connect } from 'react-redux';
 import Header from '../../component/Header';
 import P_TextInput from '../../component/P_TextInput';
-import io from "socket.io-client";
+import { socket } from '../../helper/ApiConstant';
 
 
 class Home extends Component {
@@ -21,16 +21,12 @@ class Home extends Component {
             qustionSet: [],
             qustionSetId: ''
         }
-        this.socket = io('https://jitsi.api.pip-idea.tk', {
-            transports: ['websocket'],
-        }
-        )
     }
 
     componentDidMount = () => {
         const { userData, getQustionSet } = this.props
         let token = userData?.token
-        if (userData?.userType == '1') {
+        if (userData?.userType == 1) {
             getQustionSet(token).then((res) => {
                 if (res.status === 200) {
                     res?.data.map((item) => {
@@ -76,12 +72,11 @@ class Home extends Component {
             }
             getToken(data, token, loginType).then((res) => {
                 if (res.status === 200) {
-                    // this.socket.emit('join_channel', { channelId: res.data.channelId });
+                    socket.emit('join_channel', { channelId: res?.data?.channelId });
                     if (loginType == 1) {
-                        console.log('+++++', loginType)
-                        this.props.navigation.navigate('VideoStreaming', { token: res.data.token, channelName: email, qustionSetId: this.state.qustionSetId, channelId: res.data.channelId })
+                        this.props.navigation.navigate('VideoStreaming', { token: res?.data?.token, channelName: email, qustionSetId: this.state.qustionSetId, channelId: res?.data?.channelId })
                     } else {
-                        this.props.navigation.navigate('VideoStreamingUser', { token: res.data.token, channelName: email, channelId: res.data.channelId })
+                        this.props.navigation.navigate('VideoStreamingUser', { token: res?.data?.token, channelName: email, channelId: res?.data?.channelId })
                     }
                 } else {
                     showAlertMessage({
@@ -118,8 +113,21 @@ class Home extends Component {
                     </View>
                     {this.state.qustionSet.map((item, index) => {
                         return (
-                            <TouchableOpacity style={styles.listStyle} onPress={() => this.setState({ qustionSetId: item._id })} >
+                            <TouchableOpacity style={styles.listStyle} onPress={() => {
+                                for (let i = 0; i < this.state.qustionSet.length; i++) {
+                                    if (index == i) {
+                                        this.state.qustionSet[i].status = true
+                                    } else {
+                                        this.state.qustionSet[i].status = false
+                                    }
+                                }
+                                this.setState({})
+                                this.setState({ qustionSetId: item?._id })
+                            }} >
                                 <Text>{item?.name}</Text>
+                                <View style={styles.radioOutside}>
+                                    {item?.status ? <View style={styles.radioInside}></View> : <></>}
+                                </View>
                             </TouchableOpacity>
                         )
                     })}

@@ -5,6 +5,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    FlatList
 } from 'react-native';
 import RtcEngine, {
     RtcLocalView,
@@ -23,12 +24,34 @@ import * as actions from '../../actions';
 import { connect } from 'react-redux';
 import io from "socket.io-client";
 import ShareScreen from '../ShareScreen';
+import { socket } from '../../helper/ApiConstant';
+import Header from '../../component/Header';
 
-/**
- * @property appId Agora App ID
- * @property token Token for the channel;
- * @property channelName Channel Name for the current session
- */
+let data = [
+    {
+        name: '231',
+    },
+    {
+        name: '231',
+    },
+    {
+        name: '231',
+    },
+    {
+        name: '231',
+    },
+    {
+        name: '231',
+    },
+    {
+        name: '231',
+    },
+    {
+        name: '231',
+    }, {
+        name: '231',
+    },
+]
 const appId = '9f2a15f3856d48a983e9930fbc5d3c86';
 let channelName, token;
 /**
@@ -52,17 +75,13 @@ class VideoStreaming extends Component {
             isHost: true,
             joinSucceed: false,
             peerIds: [],
-            isvideo: true,
+            isvideo: false,
             qustionSetId: props.route.params?.qustionSetId,
             qustions: [],
             channelId: props.route.params?.channelId,
             isAudio: false,
             isShare: false
         };
-        this.socket = io('https://jitsi.api.pip-idea.tk', {
-            transports: ['websocket'],
-        }
-        )
         if (Platform.OS === 'android') {
             // Request required permissions from Android
             requestCameraAndAudioPermission().then(() => {
@@ -73,20 +92,13 @@ class VideoStreaming extends Component {
 
     componentDidMount() {
         this.init();
-
-
     }
 
-    /**
-     * @name init
-     * @description Function to initialize the Rtc Engine, attach event listeners and actions
-     */
     init = async () => {
         const { getQustionSetById, userData } = this.props
         let token1 = userData?.token
 
         getQustionSetById(token1, this.state.qustionSetId).then((res) => {
-            console.log('-----------res', res)
             if (res.status === 200) {
                 this.setState({ qustions: res?.data })
             } else {
@@ -178,47 +190,35 @@ class VideoStreaming extends Component {
                 })
             }
         })
-        console.log('[-----------------------------------]')
 
 
         this.startCall();
     };
 
-    // /**
-    //  * @name toggleRoll
-    //  * @description Function to toggle the roll between broadcaster and audience
-    //  */
-    // toggleRoll = async () => {
-    //     // Join Channel using null token and channel name
-    //     this.setState(
-    //         {
-    //             isHost: !this.state.isHost,
-    //         },
-    //         async () => {
-    //             await this._engine?.setClientRole(
-    //                 this.state.isHost ? ClientRole.Broadcaster : ClientRole.Audience
-    //             );
-    //         }
-    //     );
-    // };
-
-    /**
-     * @name startCall
-     * @description Function to start the call
-     */
     startCall = async () => {
         // Join Channel using null token and channel name
         await this._engine?.joinChannel(token, channelName, null, 0);
     };
 
-    /**
-     * @name endCall
-     * @description Function to end the call
-     */
+
     endCall = async () => {
         // await this._engine?.enableLocalVideo(false);
         // this.setState({ isvideo: false })
-
+        const { deleteChannel, userData } = this.props
+        let token = userData?.token
+        deleteChannel(token, this.state.channelId).then((res) => {
+            if (res.status === 200) {
+                this.setState({ peerIds: [], joinSucceed: false });
+                this.props.navigation.goBack();
+            } else {
+                showAlertMessage({
+                    title: res.message,
+                    type: 'danger',
+                });
+            }
+        }).catch((error) => {
+            showErrorAlertMessage();
+        })
         this.setState({ peerIds: [], joinSucceed: false });
         this.props.navigation.goBack();
     };
@@ -235,14 +235,27 @@ class VideoStreaming extends Component {
     render() {
         return (
             <View style={styles.max}>
+                {!this.state.isvideo && !this.state.isShare && <Header
+                    title={'Meeting name'}
+                    isBack={true}
+                />
+                }
                 {this.state.isShare ?
                     <>
-                        <ShareScreen questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => this.socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
-                        {this._renderRemoteVideos()}
+                        <ShareScreen questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
+                        {/* {this._renderRemoteVideos()} */}
                     </>
                     :
                     <View style={styles.max}>
-                        {this._renderVideos()}
+                        {this.state.isvideo ?
+                            <>
+                                {this._renderVideos()}
+                            </>
+                            :
+                            <>
+                                {this._renderRemoteVideos()}
+                            </>
+                        }
                     </View>
                 }
                 {this._renderButton()}
@@ -262,11 +275,11 @@ class VideoStreaming extends Component {
                             renderMode={VideoRenderMode.Fit}
                         />
                         :
-                        <View style={{ backgroundColor: 'red', flex: 1 }} ></View>
+                        <View style={styles.adminBackground} ></View>
                 ) : (
                     <></>
                 )}
-                {this._renderRemoteVideos()}
+                {/* {this._renderRemoteVideos()} */}
             </View>
         ) : null;
     };
@@ -274,35 +287,65 @@ class VideoStreaming extends Component {
     _renderRemoteVideos = () => {
         const { peerIds } = this.state;
         return (
-            <ScrollView
+            <FlatList
+                data={peerIds}
+                numColumns={2}
                 style={styles.remoteContainer}
                 contentContainerStyle={styles.remoteContainerContent}
-                horizontal={true}
-            >
-                {peerIds.map((value) => {
+                initialNumToRender={6}
+                renderItem={({ item, index }) => {
                     return (
                         <>
-                            {value.video ?
-                                <RtcRemoteView.SurfaceView
-                                    style={styles.remote}
-                                    uid={value.id}
-                                    channelId={channelName}
-                                    renderMode={VideoRenderMode.Hidden}
-                                    zOrderMediaOverlay={true}
-                                />
+                            {index <= 5 ?
+                                <>
+                                    {item.video ?
+                                        <RtcRemoteView.SurfaceView
+                                            style={styles.remote1}
+                                            uid={item.id}
+                                            channelId={channelName}
+                                            renderMode={VideoRenderMode.FILL}
+                                            zOrderMediaOverlay={true}
+                                        />
+                                        :
+                                        <View style={styles.remote} ></View>
+                                    }
+                                </>
                                 :
-                                <View style={[styles.remote, { backgroundColor: "black" }]} ></View>
+                                <></>
                             }
                         </>
-                    );
-                })}
-            </ScrollView>
+                    )
+                }}
+            />
+            // <ScrollView
+            //     style={styles.remoteContainer}
+            //     contentContainerStyle={styles.remoteContainerContent}
+            //     // horizontal={true}
+            // >
+            //     {peerIds.map((value) => {
+            //         return (
+            //             <>
+            //                 {value.video ?
+            //                     <RtcRemoteView.SurfaceView
+            //                         style={styles.remote}
+            //                         uid={value.id}
+            //                         channelId={channelName}
+            //                         renderMode={VideoRenderMode.Hidden}
+            //                         zOrderMediaOverlay={true}
+            //                     />
+            //                     :
+            //                     <View style={[styles.remote, { backgroundColor: "black" }]} ></View>
+            //                 }
+            //             </>
+            //         );
+            //     })}
+            // </ScrollView>
         );
     };
 
     adminShare = async () => {
         console.log('-cha', this.state.channelId)
-        this.socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
+        socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
         this.setState({ isShare: true })
 
     }

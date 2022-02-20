@@ -1,8 +1,8 @@
-import { Dimensions, FlatList, Text, View } from 'react-native'
+import { Dimensions, FlatList, Image, Text, View } from 'react-native'
 import React, { Component } from 'react'
 import styles from './style'
 import Header from '../../component/Header'
-import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import io from "socket.io-client";
 
 const { width } = Dimensions.get('window')
@@ -29,13 +29,11 @@ export default class ShareScreenUser extends Component {
         this.state = {
             questionIndex: 0
         }
-        this.socket = io('https://jitsi.api.pip-idea.tk', {
-            transports: ['websocket'],
-        }
-        )
+
     }
     render() {
         const { questions, onScrollEndDrag, userData, channelId } = this.props
+        console.log(questions)
         return (
             <View style={styles.mainView} >
                 <Header
@@ -67,13 +65,21 @@ export default class ShareScreenUser extends Component {
                     renderItem={({ item, index }) => {
                         return (
                             <View style={{ width: widthPercentageToDP(100) }} >
+                                {console.log(item)}
                                 <View style={styles.boxStyles} >
-                                    <Text style={styles.textStyle} >{`Quse ${index + 1} of ${questions[0]?.question.length}`}</Text>
+                                    <Text style={styles.textStyle} >{`Quse ${index + 1} of ${'10'}`}</Text>
                                     <Text style={styles.qustionStyle} >{item?.name}</Text>
                                     {
-                                        item.options.map((item, index) => {
+                                        item?.questionType == 0 ?
+                                            <Image source={{ uri: bucketURL + item?.image }} style={styles.imageStyle} />
+                                            :
+                                            <></>
+                                    }
+                                    {
+                                        item?.options.map((item, index) => {
                                             return (
-                                                <View style={styles.optionStyles} >
+                                                <View style={[styles.optionStyles, { marginTop: index == 0 ? heightPercentageToDP(2.5) : heightPercentageToDP(1.5) }]} >
+                                                    <View style={styles.radioCircle} ></View>
                                                     <Text style={styles.optionText} >{item}</Text>
                                                 </View>
                                             )
@@ -81,6 +87,21 @@ export default class ShareScreenUser extends Component {
                                     }
                                 </View>
                             </View>
+                            // <View style={{ width: widthPercentageToDP(100) }} >
+                            //     <View style={styles.boxStyles} >
+                            //         <Text style={styles.textStyle} >{`Quse ${index + 1} of ${'10'}`}</Text>
+                            //         <Text style={styles.qustionStyle} >{item?.name}</Text>
+                            //         {
+                            //             item.options.map((item, index) => {
+                            //                 return (
+                            //                     <View style={styles.optionStyles} >
+                            //                         <Text style={styles.optionText} >{item}</Text>
+                            //                     </View>
+                            //                 )
+                            //             })
+                            //         }
+                            //     </View>
+                            // </View>
                         )
                     }}
                 />

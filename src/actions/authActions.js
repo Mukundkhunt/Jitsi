@@ -118,3 +118,30 @@ export const setUserInfo = () => async (dispatch) => {
     dispatch({ type: SET_USER_INFO, payload: userInfo });
     return Promise.resolve(userInfo);
 };
+
+
+export const setProfile = (token, body) => async (dispatch) => {
+    let header = {
+        Accept: 'application/json',
+        authorization: token
+    }
+    return makeAPIRequest({
+        method: 'post',
+        url: api.profile,
+        data: body,
+        headers: header
+    })
+        .then(async (response) => {
+            console.log('signInUser API response :: ', response.data);
+            if (response.data.status === 200) {
+                return Promise.resolve(response.data);
+            }
+            return Promise.reject();
+        })
+        .catch((err) => {
+            return Promise.resolve(err.response.data);
+        });
+};
+
+
+

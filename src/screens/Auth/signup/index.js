@@ -67,7 +67,8 @@ class Signup extends Component {
             let data = {
                 email: email,
                 name: name,
-                password: password
+                password: password,
+                userType: 0
             }
             signUpUser(data).then((res) => {
                 if (res.status === 200) {

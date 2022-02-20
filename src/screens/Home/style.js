@@ -53,9 +53,23 @@ const styles = StyleSheet.create({
         height: hp(6),
         width: wp(86.67),
         borderRadius: 5,
-        backgroundColor: 'red',
-        marginTop: hp(1)
-    }
+        backgroundColor: Colors.AppColor,
+        marginTop: hp(1),
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10
+    },
+    radioOutside: {
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        justifyContent: 'center',
+        borderColor: Colors.themeColor,
+        // marginTop: hp(1.5)
+    },
+    radioInside: { height: 15, width: 15, borderRadius: 7.5, backgroundColor: Colors.themeColor, alignSelf: 'center' }
 
 })
 
