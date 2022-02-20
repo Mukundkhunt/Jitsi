@@ -31,17 +31,23 @@ export default StyleSheet.create({
         height: dimensions.height,
     },
     remoteContainer: {
-        width: '100%',
-        height: heightPercentageToDP(15),
+        // width: '100%',
+        // height: heightPercentageToDP(15),
         position: 'absolute',
-        bottom: 5,
+        bottom: heightPercentageToDP(2),
     },
     remoteContainerContent: {
         paddingHorizontal: 2.5,
     },
     remote: {
-        width: 150,
-        height: 150,
+        width: 60,
+        height: 75,
+        marginHorizontal: 2.5,
+        backgroundColor: 'red'
+    },
+    remote1: {
+        width: 60,
+        height: 75,
         marginHorizontal: 2.5,
     },
     noUserText: {
@@ -93,5 +99,11 @@ export default StyleSheet.create({
         backgroundColor: 'red',
         borderRadius: 21,
         justifyContent: 'center'
+    },
+    imageStyle: {
+        height: heightPercentageToDP(73.03),
+        width: '100%',
+        borderBottomLeftRadius: 40,
+        borderBottomRightRadius: 40
     }
 });

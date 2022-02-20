@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+    Image,
     Platform,
     ScrollView,
     Text,
@@ -23,13 +24,35 @@ import * as actions from '../../actions';
 import { connect } from 'react-redux';
 import ShareScreen from '../ShareScreen';
 import ShareScreenUser from '../ShareScreenUser';
-import { socket } from '../../helper/ApiConstant';
+import { bucketURL, socket } from '../../helper/ApiConstant';
+import Header from '../../component/Header';
 
 /**
  * @property appId Agora App ID
  * @property token Token for the channel;
  * @property channelName Channel Name for the current session
  */
+let Data = [
+    {
+        name: '',
+    },
+    {
+        name: '',
+    },
+    {
+        name: '',
+    },
+    {
+        name: '',
+    },
+    {
+        name: '',
+    },
+    {
+        name: '',
+    },
+]
+
 const appId = '9f2a15f3856d48a983e9930fbc5d3c86';
 let channelName, token;
 /**
@@ -53,7 +76,7 @@ class VideoStreaming extends Component {
             isHost: true,
             joinSucceed: false,
             peerIds: [],
-            isvideo: true,
+            isvideo: false,
             qustionSetId: [],
             qustions: [],
             channelId: props.route.params?.channelId,
@@ -77,7 +100,7 @@ class VideoStreaming extends Component {
         })
 
 
-        this.init();
+        // this.init();
     }
 
     /**
@@ -199,20 +222,32 @@ class VideoStreaming extends Component {
     }
 
     render() {
+        const { userData } = this.props
         return (
             <View style={styles.max}>
-                {this.state.isShare ?
+                {!this.state.isvideo ?
                     <>
-                        <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
-                        {/* {this._renderRemoteVideos()} */}
+                        <Header
+                            isBack={true}
+                            title={'Meeting Name'}
+                            isRight={true}
+                            isVideo={true}
+                            audioName={this.state.isAudio ? 'mic-outline' : 'mic-off-outline'}
+                            videoName={this.state.isvideo ? 'video' : 'video-off'}
+                            micPress={() => this.muteMic()}
+                            videoPress={() => this.muteVideo()}
+                        />
+                        <Image
+                            source={{ uri: bucketURL + userData?.image }}
+                            style={styles.imageStyle}
+                        />
                     </>
                     :
-                    <View style={styles.max}>
+                    <>
                         {this._renderVideos()}
-                    </View>
+                    </>
                 }
                 {this._renderRemoteVideos()}
-                {/* {this._renderButton()} */}
             </View>
         );
     }
@@ -251,14 +286,14 @@ class VideoStreaming extends Component {
                         <>
                             {value.video ?
                                 <RtcRemoteView.SurfaceView
-                                    style={styles.remote}
+                                    style={styles.remote1}
                                     uid={value.id}
                                     channelId={channelName}
                                     renderMode={VideoRenderMode.Fit}
                                     zOrderMediaOverlay={true}
                                 />
                                 :
-                                <View style={[styles.remote, { backgroundColor: "black" }]} ></View>
+                                <View style={styles.remote} ></View>
                             }
                         </>
                     );
@@ -267,39 +302,28 @@ class VideoStreaming extends Component {
         );
     };
 
-    adminShare = async () => {
-        console.log('-cha', this.state.channelId)
-        socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId });
-        this.setState({ isShare: true })
-        // this.socket.on('first_question', message => {
-        //     console.log('----------', message)
-        // })
-    }
 
-    _renderButton = () => {
-        return (
-            <View style={styles.bottomButton} >
-                <TouchableOpacity style={styles.lastButton} onPress={() => this.adminShare()} >
-                    <Icon name='share-outline' size={20} color={'white'} style={{ alignSelf: 'center' }} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.middleButton} onPress={() => this.muteMic()} >
-                    <Icon name={this.state.isAudio ? 'mic-off-outline' : 'mic-outline'} size={20} color={'white'} style={{ alignSelf: 'center' }} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.centerButton} onPress={() => this.endCall()} >
-                    <Icon name='call-outline' size={25} color={'white'} style={{ alignSelf: 'center' }} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.middleButton} onPress={() => this.muteVideo()} >
-                    <IconF name={this.state.isvideo ? 'video' : 'video-off'} size={17} color={'white'} style={{ alignSelf: 'center' }} />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.lastButton1} >
-                    <Icon name='people-outline' size={20} color={'white'} style={{ alignSelf: 'center' }} />
-                </TouchableOpacity>
-            </View>
-        )
-    }
+
 }
 
 const mapStateToProps = ({ auth: { userData } }) => ({
     userData,
 });
 export default connect(mapStateToProps, actions)(VideoStreaming);
+
+
+
+
+
+// {
+//     this.state.isShare ?
+//     <>
+//         <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
+//         {/* {this._renderRemoteVideos()} */}
+//     </>
+//     :
+//     <View style={styles.max}>
+//         {this._renderVideos()}
+//     </View>
+// }
+// { this._renderRemoteVideos() } 
