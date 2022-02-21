@@ -55,8 +55,9 @@ const styles = StyleSheet.create({
     imageButton: {
         height: hp(12.56),
         width: hp(12.56),
-        backgroundColor: 'black',
-        borderRadius: 5
+        borderRadius: 5,
+        borderColor: Colors.AppColor,
+        borderWidth: 1,
     },
     titleStyle: {
         fontSize: 12,

@@ -10,6 +10,7 @@ import { connect } from 'react-redux';
 import Header from '../../component/Header';
 import P_TextInput from '../../component/P_TextInput';
 import { socket } from '../../helper/ApiConstant';
+import requestCameraAndAudioPermission from '../../component/Permission';
 
 
 class Home extends Component {
@@ -20,6 +21,12 @@ class Home extends Component {
             password: '',
             qustionSet: [],
             qustionSetId: ''
+        }
+        if (Platform.OS === 'android') {
+            // Request required permissions from Android
+            requestCameraAndAudioPermission().then(() => {
+                console.log('requested!');
+            });
         }
     }
 
@@ -113,7 +120,7 @@ class Home extends Component {
                     </View>
                     {this.state.qustionSet.map((item, index) => {
                         return (
-                            <TouchableOpacity style={styles.listStyle} onPress={() => {
+                            <TouchableOpacity style={[styles.listStyle, { marginTop: index == 0 ? heightPercentageToDP(2) : heightPercentageToDP(1) }]} onPress={() => {
                                 for (let i = 0; i < this.state.qustionSet.length; i++) {
                                     if (index == i) {
                                         this.state.qustionSet[i].status = true

@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeAPIRequest } from '../helper/Global';
-import { api } from '../helper/ApiConstant';
+import { api, baseURL } from '../helper/ApiConstant';
 import { userData, userIdd, userLoggedIn } from '../helper/Constants';
 import { Platform } from 'react-native';
 import { getUserInfo } from '../helper/CommonFunctions';
@@ -144,25 +144,32 @@ export const setProfile = (token, body) => async (dispatch) => {
 };
 
 export const uploadImage = (token, body) => async (dispatch) => {
-    let header = {
-        Accept: 'application/json',
-        authorization: token,
-        // 'Content-Type': 'multipart/form-data',
-    }
-    return makeAPIRequest({
-        method: 'post',
-        url: api.uploadImage,
-        data: body,
-        headers: header
+    var url = baseURL + api.uploadImage
+
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-Type": "multipart/form-data",
+            Accept: "application/json",
+            Authorization: token
+        },
+        body: body,
+    }).then((response) => response.json()).then(async (response) => {
+        if (response.status === 200) {
+            await AsyncStorage.getItem('userData').then(data => {
+                data = JSON.parse(data);
+                data.image = response?.data?.image;
+                AsyncStorage.setItem('userData', JSON.stringify(data));
+                dispatch({ type: SET_USER_INFO, payload: data });
+            }).done();
+
+            return Promise.resolve(response)
+        } else {
+            return Promise.resolve(response)
+        }
     })
-        .then(async (response) => {
-            console.log('signInUser API response :: ', response.data);
-            if (response.data.status === 200) {
-                return Promise.resolve(response.data);
-            }
-            return Promise.reject();
-        })
         .catch((err) => {
+            console.log('------err', err.response)
             return Promise.resolve(err.response.data);
         });
 };
@@ -188,6 +195,7 @@ export const uploadProfile = (token, body) => async (dispatch) => {
             return Promise.reject();
         })
         .catch((err) => {
+            console.log('-------err', err.response)
             return Promise.resolve(err.response.data);
         });
 };

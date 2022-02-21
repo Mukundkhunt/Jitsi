@@ -9,6 +9,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { showAlertMessage, showErrorAlertMessage, validateEmail } from '../../../helper/Global'
 import * as actions from '../../../actions';
 import { connect } from 'react-redux';
+import { Icons } from '../../../helper/IconConstant';
+
 class Profile extends Component {
     constructor(props) {
         super(props);
@@ -16,18 +18,19 @@ class Profile extends Component {
             ImageData: [],
             gender: false,
             userName: '',
-            email: '',
+            email: props?.userData?.email ? props?.userData?.email : '',
             phoneNumber: '',
             age: '',
             language: '',
             ethniCity: '',
-            geoLocation: ''
+            geoLocation: '',
+            image: ''
         }
     }
 
     selectImage = async () => {
         try {
-            await launchImageLibrary({ mediaType: 'photo' }, async (response) => {
+            await launchImageLibrary({ mediaType: 'photo', includeExtra: true }, async (response) => {
                 if (response.didCancel) {
                     console.log('User cancelled image picker');
                 } else if (response.error) {
@@ -35,29 +38,12 @@ class Profile extends Component {
                 } else if (response.customButton) {
                     console.log('User tapped custom button: ', response.customButton);
                 } else {
-                    // const { uploadImage, userData } = this.props
-                    // let token = userData?.token;
-
                     let data = [{
                         url: response.assets[0].uri,
-                        name: 'photo.jpg',
+                        name: response.assets[0].fileName,
                         type: response.assets[0].type
                     }]
                     this.setState({ ImageData: data })
-                    // let formData = new FormData();
-                    // formData.append('image', data)
-
-                    // uploadImage(token, formData).then((res) => {
-                    //     if (res.status === 200) {
-                    //     } else {
-                    //         showAlertMessage({
-                    //             title: res.message,
-                    //             type: 'danger',
-                    //         });
-                    //     }
-                    // }).catch((error) => {
-                    //     showErrorAlertMessage();
-                    // })
                 }
 
             })
@@ -68,22 +54,36 @@ class Profile extends Component {
 
     uploadProfile = async () => {
         const { uploadImage, userData, uploadProfile } = this.props
-        const { userName, email, phoneNumber, gender, geoLocation, ethniCity, age, language } = this.state
+        const { userName, email, phoneNumber, gender, geoLocation, ethniCity, age, language, image } = this.state
         let token = userData?.token;
-        let formData = new FormData();
-        formData.append('image', this.state.ImageData[0])
-        uploadImage(token, formData).then((res) => {
-            if (res.status === 200) {
-
-            } else {
-                showAlertMessage({
-                    title: res.message,
-                    type: 'danger',
-                });
-            }
-        }).catch((error) => {
-            showErrorAlertMessage();
-        })
+        if (!userName && userName == '') {
+            showAlertMessage({
+                title: "Username can't be empty!",
+                description: 'Please enter your username.',
+                type: 'warning',
+            });
+            return;
+        }
+        if (this.state.ImageData.length > 0) {
+            const fromData = new FormData();
+            fromData.append("image", {
+                name: this.state.ImageData[0].name,
+                type: this.state.ImageData[0].type,
+                uri: this.state.ImageData[0].url
+            });
+            uploadImage(token, fromData).then((res) => {
+                if (res.status === 200) {
+                    this.setState({ image: res?.data?.image })
+                } else {
+                    showAlertMessage({
+                        title: res.message,
+                        type: 'danger',
+                    });
+                }
+            }).catch((error) => {
+                showErrorAlertMessage();
+            })
+        }
 
         let data = {
             name: userName,
@@ -93,7 +93,7 @@ class Profile extends Component {
         if (age) data.age = age
         if (language) data.address = language
         if (geoLocation) data.address = geoLocation
-
+        if (image) data.image = image
         uploadProfile(token, data).then((res) => {
             if (res.status === 200) {
                 this.props.navigation.navigate('Home')
@@ -121,7 +121,10 @@ class Profile extends Component {
                     />
                     <View style={styles.boxStyle} >
                         <TouchableOpacity style={styles.imageButton} onPress={() => this.selectImage()} >
-                            <Image source={{ uri: this.state.ImageData[0]?.url }} style={{ height: 100, width: 100 }} />
+                            {this.state.ImageData.length > 0 ?
+                                <Image source={{ uri: this.state.ImageData[0]?.url }} style={{ height: 100, width: 100 }} />
+                                : <Image source={Icons.p} style={styles.imageButton} resizeMode={'contain'} ></Image>
+                            }
                         </TouchableOpacity>
                         <P_TextInput
                             title={'Username*'}
@@ -135,6 +138,7 @@ class Profile extends Component {
                                 placeholder={'Enter Your Email'}
                                 iconName={'mail-outline'}
                                 onChangeText={(text) => this.setState({ email: text })}
+                                value={this.state.email}
                             />
                         </View>
                         <View style={{ marginTop: 20 }} >

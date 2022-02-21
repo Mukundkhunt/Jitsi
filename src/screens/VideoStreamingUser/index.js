@@ -84,12 +84,7 @@ class VideoStreaming extends Component {
             isShare: false
         };
 
-        if (Platform.OS === 'android') {
-            // Request required permissions from Android
-            requestCameraAndAudioPermission().then(() => {
-                console.log('requested!');
-            });
-        }
+
     }
 
     componentDidMount = async () => {
@@ -170,7 +165,6 @@ class VideoStreaming extends Component {
         });
 
         this._engine.addListener('RemoteVideoStateChanged', (uid, state, reason, elapsed) => {
-            console.log('----------------------uid', uid, state)
             if (state == VideoRemoteState.Stopped) {
                 this.state.peerIds.map((item, index) => {
                     if (item.id === uid) {
@@ -288,7 +282,7 @@ class VideoStreaming extends Component {
                             renderMode={VideoRenderMode.Hidden}
                         />
                         :
-                        <View style={{ backgroundColor: 'red', flex: 1 }} ></View>
+                        <View style={styles.adminBackground} ></View>
                 ) : (
                     <></>
                 )}
@@ -345,20 +339,3 @@ const mapStateToProps = ({ auth: { userData } }) => ({
     userData,
 });
 export default connect(mapStateToProps, actions)(VideoStreaming);
-
-
-
-
-
-// {
-//     this.state.isShare ?
-//     <>
-//         <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('next_question', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
-//         {/* {this._renderRemoteVideos()} */}
-//     </>
-//     :
-//     <View style={styles.max}>
-//         {this._renderVideos()}
-//     </View>
-// }
-// { this._renderRemoteVideos() } 

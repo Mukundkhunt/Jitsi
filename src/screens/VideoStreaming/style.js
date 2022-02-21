@@ -1,6 +1,7 @@
 import { Dimensions, StyleSheet } from 'react-native';
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
 import { Colors } from '../../helper/colors/Colors';
+import { Fonts } from '../../helper/fonts/Fonts';
 
 const dimensions = {
     width: Dimensions.get('window').width,
@@ -10,6 +11,7 @@ const dimensions = {
 export default StyleSheet.create({
     max: {
         flex: 1,
+        // alignItems: 'center'
     },
     buttonHolder: {
         height: 100,
@@ -28,6 +30,7 @@ export default StyleSheet.create({
         color: '#fff',
     },
     fullView: {
+        flex: 1,
         width: dimensions.width,
         height: dimensions.height,
     },
@@ -42,7 +45,7 @@ export default StyleSheet.create({
     remote: {
         width: widthPercentageToDP(41.6),
         height: heightPercentageToDP(23.02),
-        backgroundColor: 'red',
+        backgroundColor: Colors.blackColor,
         margin: 5
     },
     remote1: {
@@ -102,6 +105,11 @@ export default StyleSheet.create({
     },
     adminBackground: {
         backgroundColor: Colors.AppColor,
-        flex: 1
+        flex: 1,
+    },
+    textUser: {
+        fontFamily: Fonts.bold,
+        fontSize: 16,
+        alignSelf: 'center'
     }
 });

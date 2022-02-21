@@ -1,5 +1,6 @@
 import { Dimensions, StyleSheet } from 'react-native';
 import { heightPercentageToDP } from 'react-native-responsive-screen';
+import { Colors } from '../../helper/colors/Colors';
 
 const dimensions = {
     width: Dimensions.get('window').width,
@@ -43,7 +44,7 @@ export default StyleSheet.create({
         width: 60,
         height: 75,
         marginHorizontal: 2.5,
-        backgroundColor: 'red'
+        backgroundColor: Colors.blackColor
     },
     remote1: {
         width: 60,
@@ -109,5 +110,9 @@ export default StyleSheet.create({
         width: '100%',
         borderBottomLeftRadius: 40,
         borderBottomRightRadius: 40
+    },
+    adminBackground: {
+        backgroundColor: Colors.AppColor,
+        flex: 1,
     },
 });

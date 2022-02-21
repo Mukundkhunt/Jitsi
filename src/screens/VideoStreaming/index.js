@@ -212,19 +212,19 @@ class VideoStreaming extends Component {
         // this.setState({ isvideo: false })
         const { deleteChannel, userData } = this.props
         let token = userData?.token
-        deleteChannel(token, this.state.channelId).then((res) => {
-            if (res.status === 200) {
-                this.setState({ peerIds: [], joinSucceed: false });
-                this.props.navigation.goBack();
-            } else {
-                showAlertMessage({
-                    title: res.message,
-                    type: 'danger',
-                });
-            }
-        }).catch((error) => {
-            showErrorAlertMessage();
-        })
+        // deleteChannel(token, this.state.channelId).then((res) => {
+        //     if (res.status === 200) {
+        //         this.setState({ peerIds: [], joinSucceed: false });
+        //         this.props.navigation.goBack();
+        //     } else {
+        //         showAlertMessage({
+        //             title: res.message,
+        //             type: 'danger',
+        //         });
+        //     }
+        // }).catch((error) => {
+        //     showErrorAlertMessage();
+        // })
         this.setState({ peerIds: [], joinSucceed: false });
         this.props.navigation.goBack();
     };
@@ -241,11 +241,7 @@ class VideoStreaming extends Component {
     render() {
         return (
             <View style={styles.max}>
-                {!this.state.isvideo && !this.state.isShare && <Header
-                    title={'Meeting name'}
-                    isBack={true}
-                />
-                }
+
                 {this.state.isShare ?
                     <>
                         <ShareScreen questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
@@ -254,13 +250,13 @@ class VideoStreaming extends Component {
                     :
                     <View style={styles.max}>
                         {this.state.isvideo ?
-                            <>
+                            <View style={{ flex: 1 }}>
                                 {this._renderVideos()}
-                            </>
+                            </View>
                             :
-                            <>
+                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} >
                                 {this._renderRemoteVideos()}
-                            </>
+                            </View>
                         }
                     </View>
                 }
@@ -272,80 +268,57 @@ class VideoStreaming extends Component {
     _renderVideos = () => {
         const { joinSucceed } = this.state;
         return joinSucceed ? (
-            <View style={styles.fullView}>
-                {this.state.isHost ? (
-                    this.state.isvideo ?
-                        <RtcLocalView.SurfaceView
-                            style={styles.max}
-                            channelId={channelName}
-                            renderMode={VideoRenderMode.Fit}
-                        />
-                        :
-                        <View style={styles.adminBackground} ></View>
-                ) : (
-                    <></>
-                )}
-                {/* {this._renderRemoteVideos()} */}
-            </View>
-        ) : null;
-    };
+            <>
+                <RtcLocalView.SurfaceView
+                    style={styles.max}
+                    channelId={channelName}
+                    renderMode={VideoRenderMode.Hidden}
+                />
+            </>
+        ) : (
+            <></>
+        )
+    }
 
     _renderRemoteVideos = () => {
         const { peerIds } = this.state;
         return (
-            <FlatList
-                data={peerIds}
-                numColumns={2}
-                style={styles.remoteContainer}
-                contentContainerStyle={styles.remoteContainerContent}
-                initialNumToRender={6}
-                renderItem={({ item, index }) => {
-                    return (
-                        <>
-                            {index <= 5 ?
+            <>
+                {peerIds.length > 0 ?
+                    <FlatList
+                        data={peerIds}
+                        numColumns={2}
+                        style={styles.remoteContainer}
+                        contentContainerStyle={styles.remoteContainerContent}
+                        initialNumToRender={6}
+                        renderItem={({ item, index }) => {
+                            return (
                                 <>
-                                    {item.video ?
-                                        <RtcRemoteView.SurfaceView
-                                            style={styles.remote1}
-                                            uid={item.id}
-                                            channelId={channelName}
-                                            renderMode={VideoRenderMode.FILL}
-                                            zOrderMediaOverlay={true}
-                                        />
+                                    {index <= 5 ?
+                                        <>
+                                            {item.video ?
+                                                <RtcRemoteView.SurfaceView
+                                                    style={styles.remote1}
+                                                    uid={item.id}
+                                                    channelId={channelName}
+                                                    renderMode={VideoRenderMode.FILL}
+                                                    zOrderMediaOverlay={true}
+                                                />
+                                                :
+                                                <View style={styles.remote} ></View>
+                                            }
+                                        </>
                                         :
-                                        <View style={styles.remote} ></View>
+                                        <></>
                                     }
                                 </>
-                                :
-                                <></>
-                            }
-                        </>
-                    )
-                }}
-            />
-            // <ScrollView
-            //     style={styles.remoteContainer}
-            //     contentContainerStyle={styles.remoteContainerContent}
-            //     // horizontal={true}
-            // >
-            //     {peerIds.map((value) => {
-            //         return (
-            //             <>
-            //                 {value.video ?
-            //                     <RtcRemoteView.SurfaceView
-            //                         style={styles.remote}
-            //                         uid={value.id}
-            //                         channelId={channelName}
-            //                         renderMode={VideoRenderMode.Hidden}
-            //                         zOrderMediaOverlay={true}
-            //                     />
-            //                     :
-            //                     <View style={[styles.remote, { backgroundColor: "black" }]} ></View>
-            //                 }
-            //             </>
-            //         );
-            //     })}
-            // </ScrollView>
+                            )
+                        }}
+                    />
+                    :
+                    <Text style={styles.textUser} >Waiting of user joining....</Text>
+                }
+            </>
         );
     };
 

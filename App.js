@@ -6,8 +6,7 @@ import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
 import Route from './src/route/Route';
-import { socket } from './src/helper/ApiConstant';
-import io from "socket.io-client";
+
 
 
 const store = createStore(rootReducer, {}, applyMiddleware(thunk));

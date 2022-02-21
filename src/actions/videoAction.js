@@ -88,7 +88,7 @@ export const deleteChannel = (token, id) => async (dispatch) => {
         authorization: token
     }
     return makeAPIRequest({
-        method: 'get',
+        method: 'delete',
         url: `${api.admin}/${id}`,
         headers: header
     })
