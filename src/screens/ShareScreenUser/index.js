@@ -68,7 +68,7 @@ export default class ShareScreenUser extends Component {
         socket.emit('buzzer_on', { channelId: channelId, user: userData })
     }
     render() {
-        const { questions, onScrollEndDrag, userData, channelId } = this.props
+        const { questions, onScrollEndDrag, userData, channelId, questionsLength } = this.props
         return (
             <View style={styles.mainView} >
                 <Header
@@ -84,7 +84,7 @@ export default class ShareScreenUser extends Component {
                         return (
                             <View style={{ width: widthPercentageToDP(100) }} >
                                 <View style={styles.boxStyles} >
-                                    <Text style={styles.textStyle} >{`Quse ${index + 1} of ${'10'}`}</Text>
+                                    <Text style={styles.textStyle} >{`Quse ${index + 1} of ${questionsLength}`}</Text>
                                     <Text style={styles.qustionStyle} >{item?.name}</Text>
                                     {
                                         item?.questionType == 0 ?
@@ -97,7 +97,7 @@ export default class ShareScreenUser extends Component {
                                         item?.options.map((item, index) => {
                                             return (
                                                 <View style={[styles.optionStyles, { marginTop: index == 0 ? heightPercentageToDP(2.5) : heightPercentageToDP(1.5) }]} >
-                                                    <View style={styles.radioCircle} ></View>
+                                                    {/* <View style={styles.radioCircle} ></View> */}
                                                     <Text style={styles.optionText} >{item}</Text>
                                                 </View>
                                             )

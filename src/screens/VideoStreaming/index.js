@@ -244,7 +244,7 @@ class VideoStreaming extends Component {
 
                 {this.state.isShare ?
                     <>
-                        <ShareScreen questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} onScrollEndDrag={() => socket.emit('admin_share', { question: this.state.qustions[0].question[0], channelId: this.state.channelId })} />
+                        <ShareScreen questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} />
                         {/* {this._renderRemoteVideos()} */}
                     </>
                     :
@@ -328,7 +328,7 @@ class VideoStreaming extends Component {
             this.setState({ isShare: false })
         } else {
             await this._engine?.enableLocalVideo(false);
-            socket.emit('admin_share', { question: [this.state.qustions[0].question[0]], channelId: this.state.channelId });
+            socket.emit('admin_share', { question: [this.state.qustions[0].question[0]], channelId: this.state.channelId, questionsLength: this.state.qustions[0].question.length });
             this.setState({ isShare: true, isvideo: false })
         }
     }

@@ -81,7 +81,8 @@ class VideoStreaming extends Component {
             qustions: [],
             channelId: props.route.params?.channelId,
             isAudio: true,
-            isShare: false
+            isShare: false,
+            qustionLength: 0
         };
 
 
@@ -92,7 +93,7 @@ class VideoStreaming extends Component {
             // this.state.qustions.push({ question: data.question })
             await this._engine?.enableLocalAudio(false);
             await this._engine?.enableLocalVideo(false);
-            this.setState({ qustions: data.question, isShare: true, isvideo: false, isAudio: false })
+            this.setState({ qustions: data.question, isShare: true, isvideo: false, isAudio: false, qustionLength: data?.questionsLength })
         })
 
         socket.on('stop_question', async (data) => {
@@ -235,7 +236,7 @@ class VideoStreaming extends Component {
                 <>
                     {this.state.isShare ?
                         <>
-                            <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} addAnswer={this.props.addAnswer} />
+                            <ShareScreenUser questions={this.state.qustions} userData={this.props.userData} channelId={this.state.channelId} addAnswer={this.props.addAnswer} questionsLength={this.state.qustionLength} />
                             {this._renderRemoteVideos()}
                         </>
                         :

@@ -1,4 +1,4 @@
-import { Dimensions, FlatList, Image, Text, View } from 'react-native'
+import { Dimensions, FlatList, Image, Text, View, TouchableOpacity } from 'react-native'
 import React, { Component } from 'react'
 import styles from './style'
 import Header from '../../component/Header'
@@ -50,7 +50,7 @@ export default class ShareScreen extends Component {
                             questions[0]?.question.length
                         );
                         // if (pagenumber - 1 < this.state.questionIndex) {
-                        socket.emit('admin_share', { question: [questions[0].question[pagenumber - 1]], channelId: channelId })
+                        socket.emit('admin_share', { question: [questions[0].question[pagenumber - 1]], channelId: channelId, questionsLength: questions[0]?.question.length })
                         // } else {
                         //     this.socket.emit('next_question', { question: questions[0].question[pagenumber - 1], channelId: channelId })
                         //     // this.socket.emit('next_question', { question: this.state.qustions[0].question[pagenumber - 1], channelId: channelId })
@@ -61,6 +61,7 @@ export default class ShareScreen extends Component {
                     getItemLayout={(data, index) => ({ length: width, offset: width * index, index })}
                     keyExtractor={(item, index) => index.toString()}
                     snapToOffsets={questions[0]?.question.map((st, index) => index * width)}
+                    ref={ref => (this.flatlist = ref)}
                     renderItem={({ item, index }) => {
                         return (
                             <View style={{ width: widthPercentageToDP(100) }} >
@@ -85,6 +86,7 @@ export default class ShareScreen extends Component {
                                         })
                                     }
                                 </View>
+                                <TouchableOpacity style={{ height: 50, width: 50, backgroundColor: 'red', position: 'absolute', right: 0, zIndex: 100, }} onPress={() => this.flatlist.scrollToIndex({ index: 1 })} ></TouchableOpacity>
                             </View>
                         )
                     }}
